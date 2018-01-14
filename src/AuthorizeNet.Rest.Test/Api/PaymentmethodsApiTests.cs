@@ -28,6 +28,7 @@ using System.Linq;
 using System.Reflection;
 using RestSharp;
 using NUnit.Framework;
+using NMock;
 
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
@@ -46,6 +47,10 @@ namespace AuthorizeNet.Rest.Test
     public class PaymentmethodsApiTests
     {
         private PaymentmethodsApi instance;
+
+        private MockFactory mockFactory = new MockFactory();
+        
+        private Mock<IRestClient> mockRestClient;
 
         /// <summary>
         /// Setup before each unit test
