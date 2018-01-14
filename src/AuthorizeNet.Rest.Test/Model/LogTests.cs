@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void LogInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Log
-            //Assert.IsInstanceOfType<Log> (instance, "variable 'instance' is a Log");
+            // TODO uncomment below to test "IsInstanceOf" Log
+            //Assert.IsInstanceOf<Log> (instance, "variable 'instance' is a Log");
         }
 
         /// <summary>

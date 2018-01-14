@@ -36,6 +36,37 @@ using RestSharp;
 namespace AuthorizeNet.Rest.Client
 {
     /// <summary>
+    /// Changes Done to enable the Logging and masking in Client Library.
+    /// </summary>
+    public partial class ApiClient
+    {
+        partial void InterceptResponse(IRestRequest request, IRestResponse response)
+        {
+            var log_request = JsonConvert.SerializeObject(request);
+            var log_response = JsonConvert.SerializeObject(response);
+            // Masking request and Response
+            string[] masked_log = new string[2] { Masking(log_request), Masking(log_response) };
+            var log_DebugReport = Configuration.ToDebugReport();
+            var log_timestamp = DateTime.Now.ToString();
+            string[] log = { log_timestamp, log_DebugReport, masked_log[0], masked_log[1] };
+            File.AppendAllLines(Configuration.TempFolderPath + "Auth_log.txt", log);
+        }
+
+        // Filters to be masked
+        string[] filters = new string[]{ "country", "email", "cardNumber", "expirationDate", "cardCode" , "cardType" };
+        public string Masking(string item)
+        {
+            foreach(var filter in filters)
+            {
+                 var reg = string.Concat( @"(\\""", filter,@"\\"":\\""[\w|\d|.@-]+\\"")");
+                Console.WriteLine(reg);
+                item = Regex.Replace(item, reg,string.Concat( @"""\", filter, @"\:\XXXXXXX\"));
+            }
+              return item;
+        }
+    }
+
+    /// <summary>
     /// API client is mainly responsible for making the HTTP call to the API backend.
     /// </summary>
     public partial class ApiClient
@@ -66,6 +97,13 @@ namespace AuthorizeNet.Rest.Client
         {
             Configuration = Configuration.Default;
             RestClient = new RestClient("https://api.authorize.net/v1");
+        }
+
+        // Defining the ApiCLient for Mock Tests
+        public ApiClient(IRestClient restClient)
+        {
+            Configuration = AuthorizeNet.Rest.Configuration.Default;
+            RestClient = restClient;
         }
 
         /// <summary>

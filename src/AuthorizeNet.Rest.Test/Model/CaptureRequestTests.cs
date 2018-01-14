@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CaptureRequestInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" CaptureRequest
-            //Assert.IsInstanceOfType<CaptureRequest> (instance, "variable 'instance' is a CaptureRequest");
+            // TODO uncomment below to test "IsInstanceOf" CaptureRequest
+            //Assert.IsInstanceOf<CaptureRequest> (instance, "variable 'instance' is a CaptureRequest");
         }
 
         /// <summary>

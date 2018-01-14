@@ -71,8 +71,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void InstanceTest()
         {
-            // test 'IsInstanceOfType' EventtypesApi
-            Assert.IsInstanceOfType(typeof(EventtypesApi), instance, "instance is a EventtypesApi");
+            // test 'IsInstanceOf' EventtypesApi
+            Assert.IsInstanceOf(typeof(EventtypesApi), instance, "instance is a EventtypesApi");
         }
 
         

@@ -71,8 +71,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void InstanceTest()
         {
-            // test 'IsInstanceOfType' WebhooksApi
-            Assert.IsInstanceOfType(typeof(WebhooksApi), instance, "instance is a WebhooksApi");
+            // test 'IsInstanceOf' WebhooksApi
+            Assert.IsInstanceOf(typeof(WebhooksApi), instance, "instance is a WebhooksApi");
         }
 
         

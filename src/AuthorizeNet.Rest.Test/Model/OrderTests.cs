@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void OrderInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Order
-            //Assert.IsInstanceOfType<Order> (instance, "variable 'instance' is a Order");
+            // TODO uncomment below to test "IsInstanceOf" Order
+            //Assert.IsInstanceOf<Order> (instance, "variable 'instance' is a Order");
         }
 
         /// <summary>

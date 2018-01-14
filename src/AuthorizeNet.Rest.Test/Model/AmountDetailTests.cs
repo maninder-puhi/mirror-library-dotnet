@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void AmountDetailInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" AmountDetail
-            //Assert.IsInstanceOfType<AmountDetail> (instance, "variable 'instance' is a AmountDetail");
+            // TODO uncomment below to test "IsInstanceOf" AmountDetail
+            //Assert.IsInstanceOf<AmountDetail> (instance, "variable 'instance' is a AmountDetail");
         }
 
         /// <summary>

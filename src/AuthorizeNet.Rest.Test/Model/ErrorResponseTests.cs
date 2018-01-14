@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void ErrorResponseInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" ErrorResponse
-            //Assert.IsInstanceOfType<ErrorResponse> (instance, "variable 'instance' is a ErrorResponse");
+            // TODO uncomment below to test "IsInstanceOf" ErrorResponse
+            //Assert.IsInstanceOf<ErrorResponse> (instance, "variable 'instance' is a ErrorResponse");
         }
 
         /// <summary>

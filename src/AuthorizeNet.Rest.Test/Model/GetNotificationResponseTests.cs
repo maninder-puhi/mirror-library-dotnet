@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void GetNotificationResponseInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" GetNotificationResponse
-            //Assert.IsInstanceOfType<GetNotificationResponse> (instance, "variable 'instance' is a GetNotificationResponse");
+            // TODO uncomment below to test "IsInstanceOf" GetNotificationResponse
+            //Assert.IsInstanceOf<GetNotificationResponse> (instance, "variable 'instance' is a GetNotificationResponse");
         }
 
         /// <summary>

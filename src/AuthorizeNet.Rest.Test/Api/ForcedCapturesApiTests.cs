@@ -71,8 +71,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void InstanceTest()
         {
-            // test 'IsInstanceOfType' ForcedCapturesApi
-            Assert.IsInstanceOfType(typeof(ForcedCapturesApi), instance, "instance is a ForcedCapturesApi");
+            // test 'IsInstanceOf' ForcedCapturesApi
+            Assert.IsInstanceOf(typeof(ForcedCapturesApi), instance, "instance is a ForcedCapturesApi");
         }
 
         

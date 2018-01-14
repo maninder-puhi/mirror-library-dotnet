@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void ProcessorInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Processor
-            //Assert.IsInstanceOfType<Processor> (instance, "variable 'instance' is a Processor");
+            // TODO uncomment below to test "IsInstanceOf" Processor
+            //Assert.IsInstanceOf<Processor> (instance, "variable 'instance' is a Processor");
         }
 
         /// <summary>

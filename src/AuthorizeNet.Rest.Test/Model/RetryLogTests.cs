@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void RetryLogInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" RetryLog
-            //Assert.IsInstanceOfType<RetryLog> (instance, "variable 'instance' is a RetryLog");
+            // TODO uncomment below to test "IsInstanceOf" RetryLog
+            //Assert.IsInstanceOf<RetryLog> (instance, "variable 'instance' is a RetryLog");
         }
 
         /// <summary>

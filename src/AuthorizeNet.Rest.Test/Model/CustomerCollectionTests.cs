@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CustomerCollectionInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" CustomerCollection
-            //Assert.IsInstanceOfType<CustomerCollection> (instance, "variable 'instance' is a CustomerCollection");
+            // TODO uncomment below to test "IsInstanceOf" CustomerCollection
+            //Assert.IsInstanceOf<CustomerCollection> (instance, "variable 'instance' is a CustomerCollection");
         }
 
         /// <summary>

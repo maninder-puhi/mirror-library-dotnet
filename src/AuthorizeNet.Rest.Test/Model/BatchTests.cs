@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void BatchInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Batch
-            //Assert.IsInstanceOfType<Batch> (instance, "variable 'instance' is a Batch");
+            // TODO uncomment below to test "IsInstanceOf" Batch
+            //Assert.IsInstanceOf<Batch> (instance, "variable 'instance' is a Batch");
         }
 
         /// <summary>

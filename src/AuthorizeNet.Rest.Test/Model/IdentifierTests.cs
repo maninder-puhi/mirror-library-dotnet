@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void IdentifierInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Identifier
-            //Assert.IsInstanceOfType<Identifier> (instance, "variable 'instance' is a Identifier");
+            // TODO uncomment below to test "IsInstanceOf" Identifier
+            //Assert.IsInstanceOf<Identifier> (instance, "variable 'instance' is a Identifier");
         }
 
         /// <summary>

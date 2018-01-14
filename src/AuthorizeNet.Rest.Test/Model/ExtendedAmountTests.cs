@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void ExtendedAmountInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" ExtendedAmount
-            //Assert.IsInstanceOfType<ExtendedAmount> (instance, "variable 'instance' is a ExtendedAmount");
+            // TODO uncomment below to test "IsInstanceOf" ExtendedAmount
+            //Assert.IsInstanceOf<ExtendedAmount> (instance, "variable 'instance' is a ExtendedAmount");
         }
 
         /// <summary>

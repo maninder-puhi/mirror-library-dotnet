@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CreditCardInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" CreditCard
-            //Assert.IsInstanceOfType<CreditCard> (instance, "variable 'instance' is a CreditCard");
+            // TODO uncomment below to test "IsInstanceOf" CreditCard
+            //Assert.IsInstanceOf<CreditCard> (instance, "variable 'instance' is a CreditCard");
         }
 
         /// <summary>

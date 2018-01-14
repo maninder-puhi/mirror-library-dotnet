@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void SelfLinkInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" SelfLink
-            //Assert.IsInstanceOfType<SelfLink> (instance, "variable 'instance' is a SelfLink");
+            // TODO uncomment below to test "IsInstanceOf" SelfLink
+            //Assert.IsInstanceOf<SelfLink> (instance, "variable 'instance' is a SelfLink");
         }
 
         /// <summary>

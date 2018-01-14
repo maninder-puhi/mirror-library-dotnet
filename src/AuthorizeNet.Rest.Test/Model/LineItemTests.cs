@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void LineItemInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" LineItem
-            //Assert.IsInstanceOfType<LineItem> (instance, "variable 'instance' is a LineItem");
+            // TODO uncomment below to test "IsInstanceOf" LineItem
+            //Assert.IsInstanceOf<LineItem> (instance, "variable 'instance' is a LineItem");
         }
 
         /// <summary>

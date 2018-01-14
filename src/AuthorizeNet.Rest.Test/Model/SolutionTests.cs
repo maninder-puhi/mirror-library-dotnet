@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void SolutionInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Solution
-            //Assert.IsInstanceOfType<Solution> (instance, "variable 'instance' is a Solution");
+            // TODO uncomment below to test "IsInstanceOf" Solution
+            //Assert.IsInstanceOf<Solution> (instance, "variable 'instance' is a Solution");
         }
 
         /// <summary>

@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void RefundRequestInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" RefundRequest
-            //Assert.IsInstanceOfType<RefundRequest> (instance, "variable 'instance' is a RefundRequest");
+            // TODO uncomment below to test "IsInstanceOf" RefundRequest
+            //Assert.IsInstanceOf<RefundRequest> (instance, "variable 'instance' is a RefundRequest");
         }
 
         /// <summary>

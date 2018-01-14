@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void AddressCollectionInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" AddressCollection
-            //Assert.IsInstanceOfType<AddressCollection> (instance, "variable 'instance' is a AddressCollection");
+            // TODO uncomment below to test "IsInstanceOf" AddressCollection
+            //Assert.IsInstanceOf<AddressCollection> (instance, "variable 'instance' is a AddressCollection");
         }
 
         /// <summary>

@@ -71,8 +71,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void InstanceTest()
         {
-            // test 'IsInstanceOfType' PaymentsApi
-            Assert.IsInstanceOfType(typeof(PaymentsApi), instance, "instance is a PaymentsApi");
+            // test 'IsInstanceOf' PaymentsApi
+            Assert.IsInstanceOf(typeof(PaymentsApi), instance, "instance is a PaymentsApi");
         }
 
         

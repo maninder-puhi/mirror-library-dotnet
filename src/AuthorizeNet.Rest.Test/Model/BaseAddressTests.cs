@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void BaseAddressInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" BaseAddress
-            //Assert.IsInstanceOfType<BaseAddress> (instance, "variable 'instance' is a BaseAddress");
+            // TODO uncomment below to test "IsInstanceOf" BaseAddress
+            //Assert.IsInstanceOf<BaseAddress> (instance, "variable 'instance' is a BaseAddress");
         }
 
         /// <summary>

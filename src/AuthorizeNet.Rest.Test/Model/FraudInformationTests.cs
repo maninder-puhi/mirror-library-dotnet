@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void FraudInformationInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" FraudInformation
-            //Assert.IsInstanceOfType<FraudInformation> (instance, "variable 'instance' is a FraudInformation");
+            // TODO uncomment below to test "IsInstanceOf" FraudInformation
+            //Assert.IsInstanceOf<FraudInformation> (instance, "variable 'instance' is a FraudInformation");
         }
 
         /// <summary>

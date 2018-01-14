@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void UpdateInvoiceInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" UpdateInvoice
-            //Assert.IsInstanceOfType<UpdateInvoice> (instance, "variable 'instance' is a UpdateInvoice");
+            // TODO uncomment below to test "IsInstanceOf" UpdateInvoice
+            //Assert.IsInstanceOf<UpdateInvoice> (instance, "variable 'instance' is a UpdateInvoice");
         }
 
         /// <summary>

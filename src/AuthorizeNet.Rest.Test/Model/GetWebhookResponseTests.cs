@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void GetWebhookResponseInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" GetWebhookResponse
-            //Assert.IsInstanceOfType<GetWebhookResponse> (instance, "variable 'instance' is a GetWebhookResponse");
+            // TODO uncomment below to test "IsInstanceOf" GetWebhookResponse
+            //Assert.IsInstanceOf<GetWebhookResponse> (instance, "variable 'instance' is a GetWebhookResponse");
         }
 
         /// <summary>

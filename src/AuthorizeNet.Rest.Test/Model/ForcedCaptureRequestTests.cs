@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void ForcedCaptureRequestInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" ForcedCaptureRequest
-            //Assert.IsInstanceOfType<ForcedCaptureRequest> (instance, "variable 'instance' is a ForcedCaptureRequest");
+            // TODO uncomment below to test "IsInstanceOf" ForcedCaptureRequest
+            //Assert.IsInstanceOf<ForcedCaptureRequest> (instance, "variable 'instance' is a ForcedCaptureRequest");
         }
 
         /// <summary>

@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CollectionLinksInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" CollectionLinks
-            //Assert.IsInstanceOfType<CollectionLinks> (instance, "variable 'instance' is a CollectionLinks");
+            // TODO uncomment below to test "IsInstanceOf" CollectionLinks
+            //Assert.IsInstanceOf<CollectionLinks> (instance, "variable 'instance' is a CollectionLinks");
         }
 
         /// <summary>

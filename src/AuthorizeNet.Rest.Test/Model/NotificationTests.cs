@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void NotificationInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Notification
-            //Assert.IsInstanceOfType<Notification> (instance, "variable 'instance' is a Notification");
+            // TODO uncomment below to test "IsInstanceOf" Notification
+            //Assert.IsInstanceOf<Notification> (instance, "variable 'instance' is a Notification");
         }
 
         /// <summary>

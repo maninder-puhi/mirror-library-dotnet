@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void LinkInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Link
-            //Assert.IsInstanceOfType<Link> (instance, "variable 'instance' is a Link");
+            // TODO uncomment below to test "IsInstanceOf" Link
+            //Assert.IsInstanceOf<Link> (instance, "variable 'instance' is a Link");
         }
 
         /// <summary>

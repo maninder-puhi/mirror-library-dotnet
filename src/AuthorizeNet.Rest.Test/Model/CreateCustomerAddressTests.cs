@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CreateCustomerAddressInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" CreateCustomerAddress
-            //Assert.IsInstanceOfType<CreateCustomerAddress> (instance, "variable 'instance' is a CreateCustomerAddress");
+            // TODO uncomment below to test "IsInstanceOf" CreateCustomerAddress
+            //Assert.IsInstanceOf<CreateCustomerAddress> (instance, "variable 'instance' is a CreateCustomerAddress");
         }
 
         /// <summary>

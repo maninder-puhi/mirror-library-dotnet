@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void PaymentLinksInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" PaymentLinks
-            //Assert.IsInstanceOfType<PaymentLinks> (instance, "variable 'instance' is a PaymentLinks");
+            // TODO uncomment below to test "IsInstanceOf" PaymentLinks
+            //Assert.IsInstanceOf<PaymentLinks> (instance, "variable 'instance' is a PaymentLinks");
         }
 
         /// <summary>

@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CreateWebhookBodyInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" CreateWebhookBody
-            //Assert.IsInstanceOfType<CreateWebhookBody> (instance, "variable 'instance' is a CreateWebhookBody");
+            // TODO uncomment below to test "IsInstanceOf" CreateWebhookBody
+            //Assert.IsInstanceOf<CreateWebhookBody> (instance, "variable 'instance' is a CreateWebhookBody");
         }
 
         /// <summary>

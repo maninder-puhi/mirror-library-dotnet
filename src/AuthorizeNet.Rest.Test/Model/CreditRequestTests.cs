@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CreditRequestInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" CreditRequest
-            //Assert.IsInstanceOfType<CreditRequest> (instance, "variable 'instance' is a CreditRequest");
+            // TODO uncomment below to test "IsInstanceOf" CreditRequest
+            //Assert.IsInstanceOf<CreditRequest> (instance, "variable 'instance' is a CreditRequest");
         }
 
         /// <summary>

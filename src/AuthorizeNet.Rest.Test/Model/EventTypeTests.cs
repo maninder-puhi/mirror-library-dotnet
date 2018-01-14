@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void EventTypeInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" EventType
-            //Assert.IsInstanceOfType<EventType> (instance, "variable 'instance' is a EventType");
+            // TODO uncomment below to test "IsInstanceOf" EventType
+            //Assert.IsInstanceOf<EventType> (instance, "variable 'instance' is a EventType");
         }
 
         /// <summary>

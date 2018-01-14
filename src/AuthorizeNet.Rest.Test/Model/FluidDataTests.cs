@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void FluidDataInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" FluidData
-            //Assert.IsInstanceOfType<FluidData> (instance, "variable 'instance' is a FluidData");
+            // TODO uncomment below to test "IsInstanceOf" FluidData
+            //Assert.IsInstanceOf<FluidData> (instance, "variable 'instance' is a FluidData");
         }
 
         /// <summary>

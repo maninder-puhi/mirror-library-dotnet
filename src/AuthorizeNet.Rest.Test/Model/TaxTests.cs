@@ -72,8 +72,8 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void TaxInstanceTest()
         {
-            // TODO uncomment below to test "IsInstanceOfType" Tax
-            //Assert.IsInstanceOfType<Tax> (instance, "variable 'instance' is a Tax");
+            // TODO uncomment below to test "IsInstanceOf" Tax
+            //Assert.IsInstanceOf<Tax> (instance, "variable 'instance' is a Tax");
         }
 
         /// <summary>
