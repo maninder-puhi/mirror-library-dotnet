@@ -21,11 +21,6 @@
  */
 
 using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection;
 using RestSharp;
 using NUnit.Framework;
 using NMock;
@@ -33,6 +28,8 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
+using System.Security.Cryptography;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +49,110 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse addressCollectionResponse = null;
+        private RestResponse addressResponse = null;
+        private RestResponse deleteResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new AddressesApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            addressResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"  
+                  {
+                        ""address1"": ""dfgdfg"",
+                        ""administrativeArea"": ""fhgfh"",
+                        ""company"": ""dgfdgfdfg"",
+                        ""country"": ""dfgdfg"",
+                        ""firstName"": ""hdfhdfh"",
+                        ""lastName"": ""dgfdfg"",
+                        ""locality"": ""dfgdfg"",
+                        ""phoneNumber"": ""456456"",
+                        ""postalCode"": ""64564564"",
+                        ""id"": ""1812686620"",
+                        ""_links"": {
+                            ""self"": {
+                            ""href"": ""/rest/v1/customers/1813850313/addresses/1812686620"",
+                            ""method"": ""GET""
+                        },
+                        ""customer"": {
+                        ""href"": ""/rest/v1/customers/1813850313"",
+                        ""method"": ""GET""
+                        }
+                    }
+                }"
+            };
+
+            addressCollectionResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{
+                    ""links"": {
+                    ""self"": {
+                        ""href"": ""/rest/v1/customers/1813850313/addresses?offset=0&limit=100"",
+                        ""method"": ""GET""
+                        }
+                       },
+                    ""embedded"": {
+                    ""addresses"": [
+                    {
+                        ""id"": ""1812686620"",
+                        ""address1"": ""dfgdfg"",
+                        ""administrativeArea"": ""fhgfh"",
+                        ""company"": ""dgfdgfdfg"",
+                        ""country"": ""dfgdfg"",
+                        ""firstName"": ""hdfhdfh"",
+                        ""lastName"": ""dgfdfg"",
+                        ""locality"": ""dfgdfg"",
+                        ""phoneNumber"": ""456456"",
+                        ""postalCode"": ""64564564"",
+                    ""_links"": {
+                        ""self"": {
+                        ""href"": ""/rest/v1/customers/1813850313/addresses/1812686620"",
+                        ""method"": ""GET""
+                    },
+                    ""customer"": {
+                    ""href"": ""/rest/v1/customers/1813850313"",
+                    ""method"": ""GET""
+                                }
+                                }
+                            }
+                    ]
+                },
+            ""totalAddresses"": 1
+            }"
+            };
+
+            deleteResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @""
+            };
+        }
+
+        private static readonly RNGCryptoServiceProvider RandStr = new RNGCryptoServiceProvider();
+        public static string Random()
+        {
+
+
+            byte rand1 = 0;
+            byte rand2 = 0;
+            byte[] random = new byte[1];
+            RandStr.GetBytes(random);
+            rand1 = random[0];
+            RandStr.GetBytes(random);
+            rand2 = random[0];
+            return rand1 + "" + rand2;
         }
 
         /// <summary>
@@ -71,28 +165,38 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of AddressesApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' AddressesApi
-            Assert.IsInstanceOf(typeof(AddressesApi), instance, "instance is a AddressesApi");
-        }
-
-        
-        /// <summary>
         /// Test CreateCustomerAddress
         /// </summary>
         [Test]
         public void CreateCustomerAddressTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //CreateCustomerAddress createCustomerAddress = null;
-            //string authorization = null;
-            //var response = instance.CreateCustomerAddress(customerId, createCustomerAddress, authorization);
-            //Assert.IsInstanceOf<Address> (response, "response is Address");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+
+            CreateCustomerAddress createCustomerAddress = new CreateCustomerAddress("Electonics City Phase 1");
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(addressResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new AddressesApi(configuration);
+
+            var response = instance.CreateCustomerAddress(customerId, createCustomerAddress, authorization);
+            Assert.IsInstanceOf<Address>(response, "response is Customer");
         }
         
         /// <summary>
@@ -101,12 +205,30 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void DeleteAddressTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string addressId = null;
-            //string authorization = null;
-            //instance.DeleteAddress(customerId, addressId, authorization);
-            
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            string addressId = "1234";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(deleteResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new AddressesApi(configuration);
+            instance.DeleteAddress(authorization, customerId, addressId);
         }
         
         /// <summary>
@@ -115,11 +237,31 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void GetAllCustomerAddressesTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string authorization = null;
-            //var response = instance.GetAllCustomerAddresses(customerId, authorization);
-            //Assert.IsInstanceOf<AddressCollection> (response, "response is AddressCollection");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(addressCollectionResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new AddressesApi(configuration);
+
+            var response = instance.GetAllCustomerAddresses(authorization, customerId);
+            Assert.IsInstanceOf<AddressCollection>(response, "response is Customer");
         }
         
         /// <summary>
@@ -128,12 +270,32 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void GetCustomerAddressTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string addressId = null;
-            //string authorization = null;
-            //var response = instance.GetCustomerAddress(customerId, addressId, authorization);
-            //Assert.IsInstanceOf<Address> (response, "response is Address");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            string addressId = "1234";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(addressResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new AddressesApi(configuration);
+
+            var response = instance.GetCustomerAddress(authorization, customerId, addressId);
+            Assert.IsInstanceOf<Address>(response, "response is Customer");
         }
         
         /// <summary>
@@ -142,13 +304,33 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void UpdateCustomerAddressTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string addressId = null;
-            //CreateCustomerAddress createCustomerAddress = null;
-            //string authorization = null;
-            //var response = instance.UpdateCustomerAddress(customerId, addressId, createCustomerAddress, authorization);
-            //Assert.IsInstanceOf<Address> (response, "response is Address");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            string addressId = "1234";
+            CreateCustomerAddress updateCustomerAddress = new CreateCustomerAddress("Electonics City Phase 1");
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(addressResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new AddressesApi(configuration);
+
+            var response = instance.UpdateCustomerAddress(customerId, addressId, updateCustomerAddress, authorization);
+            Assert.IsInstanceOf<Address>(response, "response is Customer");
         }
         
     }

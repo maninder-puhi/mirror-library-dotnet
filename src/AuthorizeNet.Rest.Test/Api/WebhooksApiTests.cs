@@ -33,6 +33,7 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +53,85 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse webhookResponse = null;
+        private RestResponse deleteResponse = null;
+        private RestResponse webhookCollectionResponse = null;
+        private RestResponse pingsResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new WebhooksApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            webhookResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{
+                    ""_links"": {
+                        ""self"": {
+                        ""href"": ""/rest/v1/webhooks/a9d073b4-186e-4762-8ead-eb9fc9f76cda""
+                                }
+                            },
+                    ""webhookId"": ""a9d073b4-186e-4762-8ead-eb9fc9f76cda"",
+                    ""name"": ""Webkook sample test"",
+                    ""status"": ""inactive"",
+                    ""url"": ""https://requestb.in/vqtt30vq"",
+                    ""eventTypes"": [
+                    ""net.authorize.customer.created""
+                        ]
+                    }"
+            };
+            webhookCollectionResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"[{
+                            ""_links"": {
+                              ""self"": {
+                                ""href"": ""/rest/v1/webhooks/c06d8249-2b56-4665-9c6d-00b01101e0d8""
+                              }
+                            },
+                            ""webhookId"": ""c06d8249-2b56-4665-9c6d-00b01101e0d8"",
+                            ""name"": ""Demowebhook"",
+                            ""status"": ""inactive"",
+                            ""url"": ""https://demo.com/"",
+                            ""eventTypes"": [
+                              ""net.authorize.customer.created""
+                            ]
+                          },
+                          {
+                            ""_links"": {
+                              ""self"": {
+                                ""href"": ""/rest/v1/webhooks/0015dcc0-4d81-4ce9-b504-01e6794b6361""
+                              }
+                            },
+                            ""webhookId"": ""0015dcc0-4d81-4ce9-b504-01e6794b6361"",
+                            ""name"": ""Demowebhook"",
+                            ""status"": ""inactive"",
+                            ""url"": ""https://demo.com/"",
+                            ""eventTypes"": [
+                              ""net.authorize.customer.created""
+                            ]
+                          }]"
+            };
+
+            deleteResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @""
+            };
+
+            pingsResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @""
+            };
         }
 
         /// <summary>
@@ -71,78 +144,161 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of WebhooksApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' WebhooksApi
-            Assert.IsInstanceOf(typeof(WebhooksApi), instance, "instance is a WebhooksApi");
-        }
-
-        
-        /// <summary>
         /// Test CreateWebhook
         /// </summary>
         [Test]
         public void CreateWebhookTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //CreateWebhookBody createWebhookBody = null;
-            //string authorization = null;
-            //var response = instance.CreateWebhook(createWebhookBody, authorization);
-            //Assert.IsInstanceOf<GetWebhookResponse> (response, "response is GetWebhookResponse");
+            string authorization = "Basic asdadsa";
+
+            CreateWebhookBody createWebhookBody = new CreateWebhookBody("Demo WebHook Notifi", "https://requestb.in/x4i0vmx4", null, "InActive");
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(webhookResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new WebhooksApi(configuration);
+
+            var response = instance.CreateWebhook(createWebhookBody, authorization);
+            Assert.IsInstanceOf<GetWebhookResponse>(response, "response is GetWebhookResponse");
         }
-        
+
         /// <summary>
         /// Test DeleteWebhook
         /// </summary>
         [Test]
         public void DeleteWebhookTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string webhookId = null;
-            //string authorization = null;
-            //instance.DeleteWebhook(webhookId, authorization);
-            
+            string authorization = "Basic asdadsa";
+            string webhookId = "1236547";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(deleteResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new WebhooksApi(configuration);
+
+            instance.DeleteWebhook(authorization, webhookId);
         }
-        
+
         /// <summary>
         /// Test GetWebhook
         /// </summary>
         [Test]
         public void GetWebhookTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string webhookId = null;
-            //string authorization = null;
-            //var response = instance.GetWebhook(webhookId, authorization);
-            //Assert.IsInstanceOf<GetWebhookResponse> (response, "response is GetWebhookResponse");
+            string authorization = "Basic asdadsa";
+            string webhookId = "1236547";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(webhookResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new WebhooksApi(configuration);
+
+            var response = instance.GetWebhook(authorization, webhookId);
+            Assert.IsInstanceOf<GetWebhookResponse>(response, "response is GetWebhookResponse");
         }
-        
+
         /// <summary>
         /// Test GetWebhooks
         /// </summary>
         [Test]
         public void GetWebhooksTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string authorization = null;
-            //var response = instance.GetWebhooks(authorization);
-            //Assert.IsInstanceOf<List<GetWebhookResponse>> (response, "response is List<GetWebhookResponse>");
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(webhookCollectionResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+            instance = new WebhooksApi(configuration);
+            var response = instance.GetWebhooks(authorization);
+            Assert.IsInstanceOf<List<GetWebhookResponse>>(response, "response is List<GetWebhookResponse>");
         }
-        
+
         /// <summary>
         /// Test PingsWebhook
         /// </summary>
         [Test]
         public void PingsWebhookTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string webhookId = null;
-            //string authorization = null;
-            //instance.PingsWebhook(webhookId, authorization);
-            
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(pingsResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+            string webhookId = "1236547";
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+            instance = new WebhooksApi(configuration);
+            instance.PingsWebhook(authorization, webhookId);
         }
         
         /// <summary>
@@ -151,14 +307,33 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void UpdateWebhookTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string webhookId = null;
-            //CreateWebhookBody updateWebhookBody = null;
-            //string authorization = null;
-            //var response = instance.UpdateWebhook(webhookId, updateWebhookBody, authorization);
-            //Assert.IsInstanceOf<GetWebhookResponse> (response, "response is GetWebhookResponse");
-        }
-        
-    }
+            string authorization = "Basic asdadsa";
+            string webhookId = "1236547";
 
+            CreateWebhookBody updateWebhookBody = new CreateWebhookBody("Demo WebHook Notifi", "https://requestb.in/x4i0vmx4", null, "InActive");
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(webhookResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new WebhooksApi(configuration);
+
+            var response = instance.UpdateWebhook(webhookId, updateWebhookBody, authorization);
+            Assert.IsInstanceOf<GetWebhookResponse>(response, "response is GetWebhookResponse");
+        }
+    }
 }

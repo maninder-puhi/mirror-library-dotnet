@@ -33,6 +33,7 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +53,37 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse invoiceResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new InvoicesApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            invoiceResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{ ""invoiceNumber"": ""76"", ""description"": ""Invoice description"", ""customer"": { ""customerProfileId"": ""1813859299"", ""email"": ""custtest@gmail.com"" },
+                ""payerName"": ""Test Payer"",
+                ""paymentDueDate"": ""2020 - 01 - 01"",
+                ""subAmount"": 10,
+                ""discountPercent"": 1,
+                ""discountAmount"": 1,
+                ""totalAmount"": 20,
+                ""currencyCode"": ""USD"",
+                ""lineItems"": [    { ""itemId"": ""1"",        ""name"": ""Name"",        ""description"": ""Desc"",        ""unitPrice"": 4,        ""quantity"": 2    }],""tax"": { ""amount"": 1,    ""name"": ""tax"",    ""taxPercent"": 2,    ""description"": ""taxt""},
+                ""status"": ""draft"",""createdDate"": ""2017 - 12 - 13T06: 15:53.48Z"",""self"": { ""href"": "" / rest / v1 / invoices / 76"",    ""title"": ""self"",    ""method"": ""get""},""supportedActions"": [    {        ""href"": ""/rest/v1/invoices/76/actions"",        ""title"": ""send"",        ""method"": ""post""    },    {        ""href"": ""/rest/v1/invoices/76"",        ""title"": ""update"",        ""method"": ""put""    },
+                        {        ""href"": ""/rest/v1/invoices/76/actions"",        ""title"": ""cancel"",    
+                ""method"": ""post""    }]}"
+            };
+
         }
 
         /// <summary>
@@ -71,84 +96,204 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of InvoicesApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' InvoicesApi
-            Assert.IsInstanceOf(typeof(InvoicesApi), instance, "instance is a InvoicesApi");
-        }
-
-        
-        /// <summary>
         /// Test CreateInvoice
         /// </summary>
         [Test]
         public void CreateInvoiceTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //CreateInvoice createInvoice = null;
-            //string authorization = null;
-            //var response = instance.CreateInvoice(createInvoice, authorization);
-            //Assert.IsInstanceOf<Invoice> (response, "response is Invoice");
+            Identifier identifier = new Identifier
+            {
+                Email = "test@test.com",
+                Reference = "Refernce"
+            };
+            Link linkSelf = new Link("Href1", "title", "Method");
+            Link paymentMethods = new Link("Href2", "paymethodstitle", "paymethods");
+            Link address = new Link("Href3", "addresstitle", "address");
+
+            CustomerLinks customerLinks = new CustomerLinks(linkSelf, paymentMethods, address);
+            Customer customer = new Customer("1813221695", "customer description", identifier, customerLinks);
+
+            LineItem lineItem = new LineItem("1", "Name", "Desc", 2, "4", false);
+            List<LineItem> lineITems = new List<LineItem>();
+            lineITems.Add(lineItem);
+
+            Tax tax = new Tax(1, "tax", 2, "taxt");
+
+            CreateInvoice createInvoice = new CreateInvoice("54321", "Invoice description", customer, "Test Payer", "2020-01-01", 10, 1, 1, 20, lineITems, tax, false);
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(invoiceResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new InvoicesApi(configuration);
+            var response = instance.CreateInvoice(createInvoice, authorization);
+            Assert.IsInstanceOf<Invoice>(response, "response is Invoice");
         }
-        
+
         /// <summary>
         /// Test GetAllInvoices
         /// </summary>
         [Test]
         public void GetAllInvoicesTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //int? offset = null;
-            //int? limit = null;
-            //string authorization = null;
-            //var response = instance.GetAllInvoices(offset, limit, authorization);
-            //Assert.IsInstanceOf<InvoicesCollection> (response, "response is InvoicesCollection");
+            int? offset = 0;
+            int? limit = 5;
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(invoiceResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new InvoicesApi(configuration);
+            var response = instance.GetAllInvoices(offset, limit, authorization);
+            Assert.IsInstanceOf<InvoicesCollection>(response, "response is InvoicesCollection");
         }
-        
+
         /// <summary>
         /// Test GetInvoice
         /// </summary>
         [Test]
         public void GetInvoiceTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string invoiceNumber = null;
-            //string authorization = null;
-            //var response = instance.GetInvoice(invoiceNumber, authorization);
-            //Assert.IsInstanceOf<Invoice> (response, "response is Invoice");
+            string invoiceNumber = "176";
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(invoiceResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new InvoicesApi(configuration);
+            var response = instance.GetInvoice(authorization, invoiceNumber);
+            Assert.IsInstanceOf<Invoice>(response, "response is Invoice");
         }
-        
+
         /// <summary>
         /// Test PerformActions
         /// </summary>
         [Test]
         public void PerformActionsTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string invoiceNumber = null;
-            //InvoiceAction invoiceAction = null;
-            //string authorization = null;
-            //var response = instance.PerformActions(invoiceNumber, invoiceAction, authorization);
-            //Assert.IsInstanceOf<Invoice> (response, "response is Invoice");
+            string invoiceNumber = null;
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(invoiceResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new InvoicesApi(configuration);
+            InvoiceAction invoiceAction = new InvoiceAction(InvoiceAction.ActionEnum.Send, "2020-10-01");
+            var response = instance.PerformActions(invoiceNumber, invoiceAction, authorization);
+            Assert.IsInstanceOf<Invoice>(response, "response is Invoice");
         }
-        
+
         /// <summary>
         /// Test UpdateInvoice
         /// </summary>
         [Test]
         public void UpdateInvoiceTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string invoiceNumber = null;
-            //UpdateInvoice updateInvoice = null;
-            //string authorization = null;
-            //var response = instance.UpdateInvoice(invoiceNumber, updateInvoice, authorization);
-            //Assert.IsInstanceOf<Invoice> (response, "response is Invoice");
+            string invoiceNumber = "1236545";
+
+            Identifier identifier = new Identifier
+            {
+                Email = "test@test.com",
+                Reference = "Refernce"
+            };
+            Link linkSelf = new Link("Href1", "title", "Method");
+            Link paymentMethods = new Link("Href2", "paymethodstitle", "paymethods");
+            Link address = new Link("Href3", "addresstitle", "address");
+
+            CustomerLinks customerLinks = new CustomerLinks(linkSelf, paymentMethods, address);
+            Customer customer = new Customer("1813221695", "customer description", identifier, customerLinks);
+
+            LineItem lineItem = new LineItem("1", "Name", "Desc", 2, "4", true);
+            List<LineItem> lineITems = new List<LineItem>();
+            lineITems.Add(lineItem);
+
+            Tax tax = new Tax(1, "tax", 2, "taxt");
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(invoiceResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new InvoicesApi(configuration);
+            UpdateInvoice updateInvoice = new UpdateInvoice("update invoice ", customer, "Test", "50", 10, 2, 12, 75, lineITems, tax);
+            var response = instance.UpdateInvoice(invoiceNumber, updateInvoice, authorization);
+            Assert.IsInstanceOf<Invoice>(response, "response is Invoice");
         }
-        
+
     }
 
 }

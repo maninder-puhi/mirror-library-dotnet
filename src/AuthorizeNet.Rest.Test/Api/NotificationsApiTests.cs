@@ -33,6 +33,7 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +53,36 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse notificationResponse = null;
+
+        private RestResponse allNotificationResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new NotificationsApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            notificationResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{ ""_links"": { ""self"": { ""href"": "" / rest / v1 / notifications / e8223fe7 - 13cb - 4e04 - 881c - bf87b9beab28"" }
+                                },  ""notificationId"": ""e8223fe7 - 13cb - 4e04 - 881c - bf87b9beab28"",  ""deliveryStatus"": ""Delivered"",  ""eventType"": ""net.authorize.customer.created"",  ""eventDate"": ""2017 - 10 - 26T12: 57:08.94"",  ""webhookId"": ""7ff82677 - 8413 - 4383 - 80d9 - 4630acff4a48"",  ""payload"": { ""merchantCustomerId"": ""php Referencess"",    ""description"": ""oCuiCthrePeta"",    ""entityName"": ""customerProfile"",    ""id"": ""1813418846""  }
+                                 }"
+            };
+            allNotificationResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{ ""_links"": { ""self"": { ""href"": "" / rest / v1 / notifications ? offset = 0 & limit = 100 & deliverystatus = Delivered & from_date = 10 / 22 / 2017 12:27:25 PM & to_date = 12 / 21 / 2017 12:27:25 PM"" }
+                             },  ""notifications"": [    {      ""_links"": {        ""self"": {          ""href"": ""/rest/v1/notifications/e8223fe7-13cb-4e04-881c-bf87b9beab28""        }
+                            },      ""notificationId"": ""e8223fe7-13cb-4e04-881c-bf87b9beab28"",      ""deliveryStatus"": ""Delivered"",      ""eventType"": ""net.authorize.customer.created"",      ""eventDate"": ""2017-10-26T12:57:08.94"",      ""webhookId"": ""7ff82677-8413-4383-80d9-4630acff4a48""    },    {      ""_links"": {        ""self"": {          ""href"": ""/rest/v1/notifications/af63042c-4219-4fac-8b2b-0c0e82280d2b""        }      },      ""notificationId"": ""af63042c-4219-4fac-8b2b-0c0e82280d2b"",      ""deliveryStatus"": ""Delivered"",      ""eventType"": ""net.authorize.customer.created"",      ""eventDate"": ""2017-10-26T15:12:20.957"",      ""webhookId"": ""7ff82677-8413-4383-80d9-4630acff4a48""    }  ]}"
+            };
         }
 
         /// <summary>
@@ -71,46 +95,73 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of NotificationsApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' NotificationsApi
-            Assert.IsInstanceOf(typeof(NotificationsApi), instance, "instance is a NotificationsApi");
-        }
-
-        
-        /// <summary>
         /// Test GetNotification
         /// </summary>
         [Test]
         public void GetNotificationTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string notificationsId = null;
-            //string authorization = null;
-            //var response = instance.GetNotification(notificationsId, authorization);
-            //Assert.IsInstanceOf<GetNotificationResponse> (response, "response is GetNotificationResponse");
+            string authorization = "Basic asdadsa";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(notificationResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+            instance = new NotificationsApi(configuration);
+            string notificationsId = "e8223fe7-13cb-4e04-881c-bf87b9beab28";
+            var response = instance.GetNotification(authorization, notificationsId);
+            Assert.IsInstanceOf<GetNotificationResponse>(response, "response is GetNotificationResponse");
         }
-        
+
         /// <summary>
         /// Test GetNotifications
         /// </summary>
         [Test]
         public void GetNotificationsTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string authorization = null;
-            //string deliveryStatus = null;
-            //string fromDate = null;
-            //string toDate = null;
-            //int? offset = null;
-            //int? limit = null;
-            //var response = instance.GetNotifications(authorization, deliveryStatus, fromDate, toDate, offset, limit);
-            //Assert.IsInstanceOf<GetNotificationsResponse> (response, "response is GetNotificationsResponse");
+            string authorization = "Basic asdadsa";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(allNotificationResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+            instance = new NotificationsApi(configuration);
+            string deliveryStatus = "Delivered";
+            string fromDate = "2017-03-03";
+            string toDate = "2018-03-03";
+            int? offset = 0;
+            int? limit = 100;
+            var response = instance.GetNotifications(authorization, deliveryStatus, fromDate, toDate, offset, limit);
+            Console.WriteLine(response);
+            Assert.IsInstanceOf<GetNotificationsResponse>(response, "response is GetNotificationsResponse");
         }
-        
     }
 
 }

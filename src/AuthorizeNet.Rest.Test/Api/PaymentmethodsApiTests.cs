@@ -33,6 +33,7 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +53,102 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse paymentMethodResponse = null;
+        private RestResponse deleteResponse = null;
+        private RestResponse paymentMethodCollectionResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new PaymentmethodsApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+
+            paymentMethodResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{
+                    ""id"": ""1808539536"",
+                    ""billTo"": {
+                                ""address1"": ""bnvbn"",
+                                ""administrativeArea"": ""vcbcvb"",
+                                ""company"": ""cbcvb"",
+                                ""country"": ""vbvbnvbn"",
+                                ""firstName"": ""gdfgdf"",
+                                ""lastName"": ""bcvb"",
+                                ""locality"": ""cvbvcb"",
+                                ""phoneNumber"": ""dfgdfg"",
+                                ""postalCode"": ""234234""
+                                },
+                    ""paymentInstrument"": {
+                    ""creditCard"": {
+                    ""cardNumber"": ""XXXX1111"",
+                    ""expirationDate"": ""2020-12"",
+                    ""cardType"": ""Visa""
+                    }
+                },
+                    ""_links"": {
+                            ""self"": {
+                            ""href"": ""/rest/v1/customers/1813850313/paymentMethods/1808539536"",
+                            ""method"": ""GET""
+                },
+                ""customer"": {
+                    ""href"": ""/rest/v1/customers/1813850313"",
+                    ""method"": ""GET""
+                                }
+                        }
+                    }"
+            };
+
+            paymentMethodCollectionResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{
+                        ""_links"": {
+                                ""self"": {
+                                ""href"": ""/rest/v1/customers/1813850313/paymentMethods?offset=0&limit=10"",
+                                ""method"": ""GET""
+                                    }
+                                },
+                        ""_embedded"": {
+                        ""paymentMethods"": [
+                                    {
+                                ""id"": ""1808539536"",
+                                ""paymentInstrument"": {
+                                ""creditCard"": {
+                                ""cardNumber"": ""XXXX1111"",
+                                ""expirationDate"": ""2020-12"",
+                                ""cardType"": ""Visa""
+                            }
+                        },
+                    ""_links"": {
+                            ""self"": {
+                            ""href"": ""/rest/v1/customers/1813850313/paymentMethods/1808539536"",
+                            ""method"": ""GET""
+                        },
+                        ""customer"": {
+                        ""href"": ""/rest/v1/customers/1813850313"",
+                        ""method"": ""GET""
+                            }
+                        }
+                    }
+                    ]
+                    },
+                 ""totalPaymentMethods"": 1
+                }"
+            };
+
+            deleteResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @""
+            };
         }
 
         /// <summary>
@@ -71,86 +161,182 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of PaymentmethodsApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' PaymentmethodsApi
-            Assert.IsInstanceOf(typeof(PaymentmethodsApi), instance, "instance is a PaymentmethodsApi");
-        }
-
-        
-        /// <summary>
         /// Test CreatePaymentMethod
         /// </summary>
         [Test]
         public void CreatePaymentMethodTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //CreatePaymentMethod createPaymentMethod = null;
-            //string authorization = null;
-            //var response = instance.CreatePaymentMethod(customerId, createPaymentMethod, authorization);
-            //Assert.IsInstanceOf<PaymentMethod> (response, "response is PaymentMethod");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            CreditCard creditCard = new CreditCard("4007000000027", DateTime.Now.AddMonths(new Random().Next(99)).ToString("yyyy-MM"), "VISA", "123");
+            PaymentInstrument paymentInstrunment = new PaymentInstrument(creditCard, null, null, null, false);
+            CreatePaymentMethod createPaymentMethod = new CreatePaymentMethod(null, null, null, paymentInstrunment);
+
+            //string paymentMethodId = "3456";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(paymentMethodResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new PaymentmethodsApi(configuration);
+
+            var response = instance.CreatePaymentMethod(customerId, createPaymentMethod, authorization);
+
+            Assert.IsInstanceOf<PaymentMethod>(response, "response is PaymentMethod");
         }
-        
+
         /// <summary>
         /// Test DeletePaymentmethod
         /// </summary>
         [Test]
         public void DeletePaymentmethodTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string paymentMethodId = null;
-            //string authorization = null;
-            //instance.DeletePaymentmethod(customerId, paymentMethodId, authorization);
-            
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            string paymentMethodId = "3456";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(deleteResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new PaymentmethodsApi(configuration);
+
+            instance.DeletePaymentmethod(authorization, customerId, paymentMethodId);
         }
-        
+
         /// <summary>
         /// Test GetCustomerPaymentMethod
         /// </summary>
         [Test]
         public void GetCustomerPaymentMethodTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string paymentMethodId = null;
-            //string authorization = null;
-            //var response = instance.GetCustomerPaymentMethod(customerId, paymentMethodId, authorization);
-            //Assert.IsInstanceOf<PaymentMethod> (response, "response is PaymentMethod");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            string paymentMethodId = "3456";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(paymentMethodResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new PaymentmethodsApi(configuration);
+
+            var response = instance.GetCustomerPaymentMethod(authorization, customerId, paymentMethodId);
+            Assert.IsInstanceOf<PaymentMethod>(response, "response is PaymentMethod");
         }
-        
+
         /// <summary>
         /// Test GetCustomerPaymentMethods
         /// </summary>
         [Test]
         public void GetCustomerPaymentMethodsTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string authorization = null;
-            //var response = instance.GetCustomerPaymentMethods(customerId, authorization);
-            //Assert.IsInstanceOf<PaymentMethodCollection> (response, "response is PaymentMethodCollection");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(paymentMethodCollectionResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new PaymentmethodsApi(configuration);
+
+            var response = instance.GetCustomerPaymentMethods(authorization, customerId);
+            Assert.IsInstanceOf<PaymentMethodCollection>(response, "response is PaymentMethod");
         }
-        
+
         /// <summary>
         /// Test UpdatePaymentMethod
         /// </summary>
         [Test]
         public void UpdatePaymentMethodTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string paymentMethodId = null;
-            //CreatePaymentMethod createPaymentMethod = null;
-            //string authorization = null;
-            //var response = instance.UpdatePaymentMethod(customerId, paymentMethodId, createPaymentMethod, authorization);
-            //Assert.IsInstanceOf<PaymentMethod> (response, "response is PaymentMethod");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            string paymentMethodId = "67568678";
+            CreditCard creditCard = new CreditCard("4007000000027", DateTime.Now.AddMonths(new Random().Next(99)).ToString("yyyy-MM"), "VISA", "123");
+            PaymentInstrument paymentInstrunment = new PaymentInstrument(creditCard, null, null, null, false);
+            CreatePaymentMethod updatePaymentMethod = new CreatePaymentMethod(null, null, null, paymentInstrunment);
+
+            //string paymentMethodId = "3456";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(paymentMethodResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new PaymentmethodsApi(configuration);
+            var response = instance.UpdatePaymentMethod(customerId, paymentMethodId, updatePaymentMethod, authorization);
+            Assert.IsInstanceOf<PaymentMethod>(response, "response is PaymentMethod");
         }
-        
     }
 
 }

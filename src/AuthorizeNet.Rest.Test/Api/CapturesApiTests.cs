@@ -33,6 +33,7 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +53,27 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse paymentResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new CapturesApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            paymentResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{ ""_links"": { ""self"": { ""href"": "" / rest / v1 / payments / 60036591146"", ""method"": ""GET"" },
+                ""refund"": { ""href"": "" / rest / v1 / payments / 60036591146 / refunds"",      ""method"": ""POST""    }
+                  },  ""id"": ""60036591146"",  ""submitTimeUTC"": ""12/22/2017 06:23:06"",  ""submitTimeLocal"": ""12/21/2017 22:23:06"",  ""transactionStatus"": ""declined"",  ""processor"": {    ""avsResponse"": ""P""  },  ""recurringBilling"": false,  ""customerIp"": ""10.142.12.19"",  ""order"": {    ""purchaseOrderNumber"": ""12365""  },  ""authAmount"": ""4000.00"",  ""settleAmount"": ""4000.00"",  ""lineItems"": [    {      ""itemId"": ""1"",      ""name"": ""tshir"",      ""description"": ""t-shir desc"",      ""quantity"": 1,      ""unitPrice"": ""100.00"",      ""taxable"": true    }  ],  ""taxExempt"": false,  ""paymentInstrument"": {    ""bankAccount"": {      ""accountType"": ""SA"",      ""routingNumber"": ""XXXX0760"",      ""accountNumber"": ""XXXX3342"",      ""nameOnAccount"": ""demo acount"",      ""eCheckType"": ""WEB""    }  },  ""billTo"": {    ""address1"": ""Demo Adress"",    ""company"": ""XXXXCOMAPNAY"",    ""country"": ""India"",    ""firstName"": ""Demo fst"",    ""lastName"": ""Demo Second"",    ""phoneNumber"": ""1123456987"",    ""postalCode"": ""192123""  },  ""shipTo"": {    ""address1"": ""Demo Adress"",    ""company"": ""XXXXCOMAPNAY"",    ""country"": ""India"",    ""firstName"": ""Demo"",    ""lastName"": ""Demo Second"",    ""phoneNumber"": ""1123456987"",    ""postalCode"": ""192123""  }}"
+            };
         }
 
         /// <summary>
@@ -69,17 +84,6 @@ namespace AuthorizeNet.Rest.Test
         {
 
         }
-
-        /// <summary>
-        /// Test an instance of CapturesApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' CapturesApi
-            Assert.IsInstanceOf(typeof(CapturesApi), instance, "instance is a CapturesApi");
-        }
-
         
         /// <summary>
         /// Test CreateACapture
@@ -87,12 +91,32 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void CreateACaptureTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string paymentId = null;
-            //CaptureRequest body = null;
-            //string authorization = null;
-            //var response = instance.CreateACapture(paymentId, body, authorization);
-            //Assert.IsInstanceOf<Payment> (response, "response is Payment");
+            Init();
+            string paymentId = "60031128902";
+            CaptureRequest body = new CaptureRequest("300");
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(paymentResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new CapturesApi(configuration);
+            var response = instance.CreateACapture(paymentId, body, authorization);
+            Assert.IsInstanceOf<Payment>(response, "response is Payment");
         }
         
     }

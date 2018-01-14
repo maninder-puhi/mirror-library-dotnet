@@ -33,6 +33,7 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +53,27 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse paymentResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new RefundsApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            paymentResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{ ""_links"": { ""self"": { ""href"": "" / rest / v1 / payments / 60036591146"", ""method"": ""GET"" },
+                ""refund"": { ""href"": "" / rest / v1 / payments / 60036591146 / refunds"",      ""method"": ""POST""    }
+                  },  ""id"": ""60036591146"",  ""submitTimeUTC"": ""12/22/2017 06:23:06"",  ""submitTimeLocal"": ""12/21/2017 22:23:06"",  ""transactionStatus"": ""declined"",  ""processor"": {    ""avsResponse"": ""P""  },  ""recurringBilling"": false,  ""customerIp"": ""10.142.12.19"",  ""order"": {    ""purchaseOrderNumber"": ""12365""  },  ""authAmount"": ""4000.00"",  ""settleAmount"": ""4000.00"",  ""lineItems"": [    {      ""itemId"": ""1"",      ""name"": ""tshir"",      ""description"": ""t-shir desc"",      ""quantity"": 1,      ""unitPrice"": ""100.00"",      ""taxable"": true    }  ],  ""taxExempt"": false,  ""paymentInstrument"": {    ""bankAccount"": {      ""accountType"": ""SA"",      ""routingNumber"": ""XXXX0760"",      ""accountNumber"": ""XXXX3342"",      ""nameOnAccount"": ""demo acount"",      ""eCheckType"": ""WEB""    }  },  ""billTo"": {    ""address1"": ""Demo Adress"",    ""company"": ""XXXXCOMAPNAY"",    ""country"": ""India"",    ""firstName"": ""Demo fst"",    ""lastName"": ""Demo Second"",    ""phoneNumber"": ""1123456987"",    ""postalCode"": ""192123""  },  ""shipTo"": {    ""address1"": ""Demo Adress"",    ""company"": ""XXXXCOMAPNAY"",    ""country"": ""India"",    ""firstName"": ""Demo"",    ""lastName"": ""Demo Second"",    ""phoneNumber"": ""1123456987"",    ""postalCode"": ""192123""  }}"
+            };
         }
 
         /// <summary>
@@ -71,30 +86,100 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of RefundsApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' RefundsApi
-            Assert.IsInstanceOf(typeof(RefundsApi), instance, "instance is a RefundsApi");
-        }
-
-        
-        /// <summary>
         /// Test CreateRefundAPayment
         /// </summary>
         [Test]
         public void CreateRefundAPaymentTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string paymentId = null;
-            //RefundRequest body = null;
-            //string authorization = null;
-            //var response = instance.CreateRefundAPayment(paymentId, body, authorization);
-            //Assert.IsInstanceOf<Payment> (response, "response is Payment");
-        }
-        
-    }
+            string paymentId = "40006143732";
+            //Amount Details
+            AmountDetail amountDetail = new AmountDetail("100.00", "USD");
 
+            // Solution Details
+            Solution solution = new Solution
+            {
+                Name = "SolDemo",
+                VendorName = "VenodeName"
+            };
+
+            // Credit Card
+            CreditCard creditCard = new CreditCard("1111", "XXXX", "VISA", "123");
+
+            // Bank Account
+            BankAccount bankAccount = new BankAccount(null, "325070760", "4111111", "demo acount", null, "bank anme",
+                null);
+            //Base AddressBillTo
+            BaseAddress baseAdressBillTo = new BaseAddress
+            {
+                Address1 = " Demo Adress",
+                Company = "XXXXCOMAPNAY",
+                Country = "India",
+                FirstName = "Demo first",
+                LastName = "Demo Second",
+                PhoneNumber = "1123456987",
+                PostalCode = "192123"
+            };
+
+            //Base AddressShipTo
+            BaseAddress baseAdressShipTo = new BaseAddress
+            {
+                Address1 = " Demo Adress",
+                Company = "XXXXCOMAPNAY",
+                Country = "India",
+                FirstName = "Demo first",
+                LastName = "Demo Second",
+                PhoneNumber = "1123456987",
+                PostalCode = "192123"
+            };
+
+            // Ip Address
+            String Ip = null;
+
+            // Order 
+            Order order = new Order("12365");
+
+            // Extended Amount Tax
+            ExtendedAmount extendedAmountTax = new ExtendedAmount("100.00", "Tax", "Tax");
+
+            // Extended Amount Duty
+            ExtendedAmount extendedAmountDuty = new ExtendedAmount("100.00", "duty", "Duty");
+
+            // Extended Amount Ship
+            ExtendedAmount extendedAmountShip = new ExtendedAmount("100.00", "ship", "Ship");
+
+            //Payment Instrunment 
+            //  PaymentInstrument paymentInstrument = new PaymentInstrument(null, bankAccount, null, null, true);
+            PaymentInstrument paymentInstrument = new PaymentInstrument(creditCard, null, null, null, true);
+
+            List<LineItem> lineItems = new List<LineItem>();
+            lineItems.Add(new LineItem("1", "tshir", "tshir desc", 1, "100", true));
+
+            RefundRequest body = new RefundRequest("50.00", order, lineItems, extendedAmountTax, extendedAmountShip,
+                extendedAmountDuty, paymentInstrument, baseAdressBillTo, baseAdressShipTo);
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(paymentResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new RefundsApi(configuration);
+
+            var response = instance.CreateRefundAPayment(paymentId, body, authorization);
+            Assert.IsInstanceOf<Payment>(response, "response is Payment");
+        }
+    }
 }

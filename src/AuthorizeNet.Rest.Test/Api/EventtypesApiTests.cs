@@ -52,13 +52,45 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse eventTypesResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new EventtypesApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            eventTypesResponse = new RestResponse
+            {
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Content = @"[  { ""name"": ""net.authorize.customer.created"" },
+                { ""name"": ""net.authorize.customer.deleted"" },
+                { ""name"": ""net.authorize.customer.updated"" },
+                { ""name"": ""net.authorize.customer.paymentProfile.created"" },
+                { ""name"": ""net.authorize.customer.paymentProfile.deleted"" },
+                { ""name"": ""net.authorize.customer.paymentProfile.updated"" },
+                { ""name"": ""net.authorize.customer.subscription.cancelled"" },
+                { ""name"": ""net.authorize.customer.subscription.created"" },
+                { ""name"": ""net.authorize.customer.subscription.expiring"" },
+                { ""name"": ""net.authorize.customer.subscription.suspended"" },
+                { ""name"": ""net.authorize.customer.subscription.terminated"" },
+                { ""name"": ""net.authorize.customer.subscription.updated"" },
+                { ""name"": ""net.authorize.payment.authcapture.created"" },
+                { ""name"": ""net.authorize.payment.authorization.created"" },
+                { ""name"": ""net.authorize.payment.capture.created"" },
+                { ""name"": ""net.authorize.payment.fraud.approved"" },
+                { ""name"": ""net.authorize.payment.fraud.declined"" },
+                { ""name"": ""net.authorize.payment.fraud.held"" },
+                { ""name"": ""net.authorize.payment.priorAuthCapture.created"" },
+                { ""name"": ""net.authorize.payment.refund.created"" },
+                { ""name"": ""net.authorize.payment.void.created""  }]"
+            };
         }
 
         /// <summary>
@@ -71,28 +103,36 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of EventtypesApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' EventtypesApi
-            Assert.IsInstanceOf(typeof(EventtypesApi), instance, "instance is a EventtypesApi");
-        }
-
-        
-        /// <summary>
         /// Test GetEventTypes
         /// </summary>
         [Test]
         public void GetEventTypesTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string authorization = null;
-            //var response = instance.GetEventTypes(authorization);
-            //Assert.IsInstanceOf<List<EventType>> (response, "response is List<EventType>");
+            string authorization = "Basic asdadsa";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(eventTypesResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+            instance = new EventtypesApi(configuration);
+            var response = instance.GetEventTypes(authorization);
+            Assert.IsInstanceOf<List<EventType>>(response, "response is List<EventType>");
         }
-        
+
     }
 
 }

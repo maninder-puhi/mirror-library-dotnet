@@ -33,6 +33,8 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
+using System.Timers;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +54,27 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse paymentResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new CreditsApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+
+            paymentResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{ ""_links"": { ""self"": { ""href"": "" / rest / v1 / payments / 60036591146"", ""method"": ""GET"" },
+                ""refund"": { ""href"": "" / rest / v1 / payments / 60036591146 / refunds"",      ""method"": ""POST""    }
+                  },  ""id"": ""60036591146"",  ""submitTimeUTC"": ""12/22/2017 06:23:06"",  ""submitTimeLocal"": ""12/21/2017 22:23:06"",  ""transactionStatus"": ""declined"",  ""processor"": {    ""avsResponse"": ""P""  },  ""recurringBilling"": false,  ""customerIp"": ""10.142.12.19"",  ""order"": {    ""purchaseOrderNumber"": ""12365""  },  ""authAmount"": ""4000.00"",  ""settleAmount"": ""4000.00"",  ""lineItems"": [    {      ""itemId"": ""1"",      ""name"": ""tshir"",      ""description"": ""t-shir desc"",      ""quantity"": 1,      ""unitPrice"": ""100.00"",      ""taxable"": true    }  ],  ""taxExempt"": false,  ""paymentInstrument"": {    ""bankAccount"": {      ""accountType"": ""SA"",      ""routingNumber"": ""XXXX0760"",      ""accountNumber"": ""XXXX3342"",      ""nameOnAccount"": ""demo acount"",      ""eCheckType"": ""WEB""    }  },  ""billTo"": {    ""address1"": ""Demo Adress"",    ""company"": ""XXXXCOMAPNAY"",    ""country"": ""India"",    ""firstName"": ""Demo fst"",    ""lastName"": ""Demo Second"",    ""phoneNumber"": ""1123456987"",    ""postalCode"": ""192123""  },  ""shipTo"": {    ""address1"": ""Demo Adress"",    ""company"": ""XXXXCOMAPNAY"",    ""country"": ""India"",    ""firstName"": ""Demo"",    ""lastName"": ""Demo Second"",    ""phoneNumber"": ""1123456987"",    ""postalCode"": ""192123""  }}"
+            };
         }
 
         /// <summary>
@@ -71,27 +87,50 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of CreditsApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' CreditsApi
-            Assert.IsInstanceOf(typeof(CreditsApi), instance, "instance is a CreditsApi");
-        }
-
-        
-        /// <summary>
         /// Test CreateACredit
         /// </summary>
         [Test]
         public void CreateACreditTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //CreditRequest body = null;
-            //string authorization = null;
-            //var response = instance.CreateACredit(body, authorization);
-            //Assert.IsInstanceOf<Payment> (response, "response is Payment");
+            //Amount Details
+            AmountDetail amountDetail = new AmountDetail("100.00", "USD");
+
+            // Credit Card
+            CreditCard creditCard = new CreditCard("4111111111111111", DateTime.Now.AddMonths(new Random().Next(99)).ToString("yyyy-MM"), "VISA", "123");
+
+
+            // Bank Account
+            BankAccount bankAccount = new BankAccount(null, "325070760", "4111111", "demo acount", null, "bank anme", null);
+
+            //Payment Instrunment 
+            //PaymentInstrument paymentInstrument = new PaymentInstrument(null,bankAccount,null, null, true);
+            PaymentInstrument paymentInstrument = new PaymentInstrument(creditCard, null, null, null, true);
+
+
+            CreditRequest body = new CreditRequest(amountDetail, paymentInstrument);
+            string authorization = "Basic asdadsa";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(paymentResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new CreditsApi(configuration);
+            var response = instance.CreateACredit(body, authorization);
+            Assert.IsInstanceOf<Payment>(response, "response is Payment");
         }
         
     }

@@ -33,6 +33,7 @@ using NMock;
 using AuthorizeNet.Rest.Client;
 using AuthorizeNet.Rest.Api;
 using AuthorizeNet.Rest.Model;
+using System.Net;
 
 namespace AuthorizeNet.Rest.Test
 {
@@ -52,13 +53,80 @@ namespace AuthorizeNet.Rest.Test
         
         private Mock<IRestClient> mockRestClient;
 
+        private RestResponse customerResponse = null;
+        private RestResponse deleteResponse = null;
+        private RestResponse customerCollectionResponse = null;
+
         /// <summary>
         /// Setup before each unit test
         /// </summary>
         [SetUp]
         public void Init()
         {
-            instance = new CustomersApi();
+            mockRestClient = mockFactory.CreateMock<IRestClient>();
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.Timeout).WillReturn(60000);
+            mockRestClient.Expects.AtLeastOne.GetProperty(_ => _.UserAgent).WillReturn("asdasd");
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.Timeout = 60000);
+            mockRestClient.Expects.AtLeastOne.SetPropertyTo(_ => _.UserAgent = "asdasd");
+            customerResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"  
+                  {  
+                    ""id"": ""1813604247"",  
+                      ""description"": ""asdasd"",  
+                      ""identifier"": {  
+                          ""email"": ""sad@asd.com"",  
+                          ""reference"": ""1324535232""  
+                      }
+                  }"
+            };
+
+            deleteResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @""
+            };
+
+            customerCollectionResponse = new RestResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = @"{
+                    ""_links"": {
+                            ""self"": {
+                            ""href"": ""/rest/v1/customers?offset=0&limit=100"",
+                            ""method"": ""GET""
+                                        }
+                                    },
+                     ""_embedded"": {
+                            ""customers"": [
+                                    {
+                            ""id"": ""1812938352"",
+                            ""description"": ""Profile description here"",
+                            ""identifier"": {
+                            ""email"": ""customer-profile-email@here.com"",
+                            ""reference"": ""Merchant_Customer_ID""
+                            },
+                        ""_links"": {
+                            ""self"": {
+                            ""href"": ""/rest/v1/customers/1812938352"",
+                            ""method"": ""GET""
+                            },
+                        ""paymentMethods"": {
+                        ""href"": ""/rest/v1/customers/1812938352/paymentMethods"",
+                        ""method"": ""GET""
+                    },
+                    ""addresses"": {
+                                ""href"": ""/rest/v1/customers/1812938352/addresses"",
+                                    ""method"": ""GET""
+                          }
+                        }
+                      }
+                    ]
+                      },
+                  ""totalCustomers"": 1
+                }"
+            };
         }
 
         /// <summary>
@@ -71,40 +139,70 @@ namespace AuthorizeNet.Rest.Test
         }
 
         /// <summary>
-        /// Test an instance of CustomersApi
-        /// </summary>
-        [Test]
-        public void InstanceTest()
-        {
-            // test 'IsInstanceOf' CustomersApi
-            Assert.IsInstanceOf(typeof(CustomersApi), instance, "instance is a CustomersApi");
-        }
-
-        
-        /// <summary>
         /// Test CreateCustomer
         /// </summary>
         [Test]
         public void CreateCustomerTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //CreateCustomer createCustomer = null;
-            //string authorization = null;
-            //var response = instance.CreateCustomer(createCustomer, authorization);
-            //Assert.IsInstanceOf<Customer> (response, "response is Customer");
+            string authorization = "Basic asdadsa";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(customerResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+            Identifier identifier = new Identifier("custtest@gmail.com", "Customer Reference");
+            CreateCustomer createCustomer = new CreateCustomer("create customer test", identifier, null);
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new CustomersApi(configuration);
+
+            var response = instance.CreateCustomer(createCustomer, authorization);
+            Assert.IsInstanceOf<Customer>(response, "response is Customer");
         }
-        
+
         /// <summary>
         /// Test DeleteCustomer
         /// </summary>
         [Test]
         public void DeleteCustomerTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string authorization = null;
-            //instance.DeleteCustomer(customerId, authorization);
-            
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(deleteResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new CustomersApi(configuration);
+
+            instance.DeleteCustomer(authorization, customerId);
         }
         
         /// <summary>
@@ -113,39 +211,102 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void GetAllCustomersTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string authorization = null;
-            //var response = instance.GetAllCustomers(authorization);
-            //Assert.IsInstanceOf<CustomerCollection> (response, "response is CustomerCollection");
+            string authorization = "Basic asdadsa";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(customerCollectionResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new CustomersApi(configuration);
+
+            var response = instance.GetAllCustomers(authorization);
+            Assert.IsInstanceOf<CustomerCollection>(response, "response is Customer");
         }
-        
+
         /// <summary>
         /// Test GetCustomer
         /// </summary>
         [Test]
         public void GetCustomerTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //string authorization = null;
-            //var response = instance.GetCustomer(customerId, authorization);
-            //Assert.IsInstanceOf<Customer> (response, "response is Customer");
+            string authorization = "Basic asdadsa";
+            string customerId = "123123";
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(customerResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new CustomersApi(configuration);
+
+            var response = instance.GetCustomer(authorization, customerId);
+            Assert.IsInstanceOf<Customer>(response, "response is Customer");
         }
-        
+
         /// <summary>
         /// Test UpdateCustomer
         /// </summary>
         [Test]
         public void UpdateCustomerTest()
         {
-            // TODO uncomment below to test the method and replace null with proper value
-            //string customerId = null;
-            //CreateCustomer createCustomer = null;
-            //string authorization = null;
-            //var response = instance.UpdateCustomer(customerId, createCustomer, authorization);
-            //Assert.IsInstanceOf<Customer> (response, "response is Customer");
+            string authorization = "Basic asdadsa";
+            string customerId = "2345";
+
+            mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(customerResponse);
+            ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
+
+            apiClient.Configuration = null;
+            Identifier identifier = new Identifier("custtest@gmail.com", "Customer Reference");
+            CreateCustomer updateCustomer = new CreateCustomer("create customer test", identifier, null);
+
+            Configuration configuration = new Configuration
+            {
+                ApiClient = apiClient,
+                Username = "Asdads",
+                Password = "asdasd",
+                AccessToken = null,
+                ApiKey = null,
+                ApiKeyPrefix = null,
+                TempFolderPath = null,
+                DateTimeFormat = null,
+                Timeout = 60000,
+                UserAgent = "asdasd"
+            };
+
+            instance = new CustomersApi(configuration);
+
+            var response = instance.UpdateCustomer(customerId, updateCustomer, authorization);
+            Assert.IsInstanceOf<Customer>(response, "response is Customer");
         }
-        
+
     }
 
 }
