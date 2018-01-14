@@ -50,14 +50,17 @@ limitations under the License.
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="RestSharp, Version=105.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\RestSharp.105.1.0\lib\net45\RestSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,18 +78,7 @@ limitations under the License.
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\AddressesApiTests.cs" />
-    <Compile Include="Api\CapturesApiTests.cs" />
-    <Compile Include="Api\CreditsApiTests.cs" />
-    <Compile Include="Api\CustomersApiTests.cs" />
-    <Compile Include="Api\EventtypesApiTests.cs" />
-    <Compile Include="Api\ForcedCapturesApiTests.cs" />
-    <Compile Include="Api\InvoicesApiTests.cs" />
-    <Compile Include="Api\NotificationsApiTests.cs" />
-    <Compile Include="Api\PaymentmethodsApiTests.cs" />
-    <Compile Include="Api\PaymentsApiTests.cs" />
-    <Compile Include="Api\RefundsApiTests.cs" />
-    <Compile Include="Api\WebhooksApiTests.cs" />
+    <Compile Include="**\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -94,7 +86,7 @@ limitations under the License.
   <Import Project="$(MsBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\AuthorizeNet.Rest\AuthorizeNet.Rest.csproj">
-      <Project>{8D245B70-24A3-4C13-B741-33056BE997D0}</Project>
+      <Project>{5D66D40D-4447-4C0F-8F94-752B470CACEF}</Project>
       <Name>AuthorizeNet.Rest</Name>
     </ProjectReference>
   </ItemGroup>
