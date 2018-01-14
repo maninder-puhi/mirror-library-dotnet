@@ -4,11 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Authorize.Net REST Library")]
-[assembly: AssemblyDescription("A library for Authorize.NET REST API")]
+[assembly: AssemblyTitle("AuthorizeNet.Rest")]
+[assembly: AssemblyDescription("AuthorizeNet SDK for REST APIs")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("AuthorizeNet")]
-[assembly: AssemblyProduct("AuthorizeNet.REST")]
+[assembly: AssemblyProduct("AuthorizeNet.Rest")]
+[assembly: AssemblyCopyright("No Copyright")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

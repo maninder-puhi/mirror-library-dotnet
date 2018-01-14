@@ -32,37 +32,35 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using RestSharp;
+using log4net;
 
 namespace AuthorizeNet.Rest.Client
 {
-    /// <summary>
-    /// Changes Done to enable the Logging and masking in Client Library.
-    /// </summary>
     public partial class ApiClient
     {
+        /// <summary>
+        /// For logging and masking in the request and response.
+        /// </summary>
         partial void InterceptResponse(IRestRequest request, IRestResponse response)
         {
-            var log_request = JsonConvert.SerializeObject(request);
-            var log_response = JsonConvert.SerializeObject(response);
-            // Masking request and Response
-            string[] masked_log = new string[2] { Masking(log_request), Masking(log_response) };
-            var log_DebugReport = Configuration.ToDebugReport();
-            var log_timestamp = DateTime.Now.ToString();
-            string[] log = { log_timestamp, log_DebugReport, masked_log[0], masked_log[1] };
-            File.AppendAllLines(Configuration.TempFolderPath + "Auth_log.txt", log);
+            var logRequest = JsonConvert.SerializeObject(request);
+            var logResponse = JsonConvert.SerializeObject(response);
+
+            Configuration.Logger.Debug($"Request: {MaskSensitiveFields(logRequest)}");
+            Configuration.Logger.Debug($"Response: {MaskSensitiveFields(logResponse)}");
         }
 
         // Filters to be masked
         string[] filters = new string[]{ "country", "email", "cardNumber", "expirationDate", "cardCode" , "cardType" };
-        public string Masking(string item)
+        public string MaskSensitiveFields(string item)
         {
             foreach(var filter in filters)
             {
-                 var reg = string.Concat( @"(\\""", filter,@"\\"":\\""[\w|\d|.@-]+\\"")");
-                Console.WriteLine(reg);
+                var reg = string.Concat( @"(\\""", filter,@"\\"":\\""[\w|\d|.@-]+\\"")");
                 item = Regex.Replace(item, reg,string.Concat( @"""\", filter, @"\:\XXXXXXX\"));
             }
-              return item;
+            
+            return item;
         }
     }
 
@@ -230,7 +228,11 @@ namespace AuthorizeNet.Rest.Client
 
             InterceptRequest(request);
             var response = RestClient.Execute(request);
-            InterceptResponse(request, response);
+
+            if(Configuration.Logger != null)
+            {
+                InterceptResponse(request, response);
+            }
 
             return (Object) response;
         }

@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using log4net;
 
 namespace AuthorizeNet.Rest.Client
 {
@@ -48,6 +49,7 @@ namespace AuthorizeNet.Rest.Client
         /// <param name="dateTimeFormat">DateTime format string</param>
         /// <param name="timeout">HTTP connection timeout (in milliseconds)</param>
         /// <param name="userAgent">HTTP user agent</param>
+        /// <param name="logger">Instance of logger from the application </param>
         public Configuration(ApiClient apiClient = null,
                              Dictionary<String, String> defaultHeader = null,
                              string username = null,
@@ -58,7 +60,8 @@ namespace AuthorizeNet.Rest.Client
                              string tempFolderPath = null,
                              string dateTimeFormat = null,
                              int timeout = 100000,
-                             string userAgent = "Swagger-Codegen/0.0.9/csharp"
+                             string userAgent = "Swagger-Codegen/0.0.9/csharp",
+                             ILog logger = null
                             )
         {
             setApiClientUsingDefault(apiClient);
@@ -67,6 +70,8 @@ namespace AuthorizeNet.Rest.Client
             Password = password;
             AccessToken = accessToken;
             UserAgent = userAgent;
+
+            Logger = logger;
 
             if (defaultHeader != null)
                 DefaultHeader = defaultHeader;
@@ -126,6 +131,12 @@ namespace AuthorizeNet.Rest.Client
                     ApiClient.RestClient.Timeout = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets instance of logger.
+        /// </summary>
+        /// <value>The Logger instance .</value>
+        public ILog Logger { get; set; }
 
         /// <summary>
         /// Gets or sets the default API client for making HTTP calls.

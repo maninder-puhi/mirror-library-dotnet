@@ -94,6 +94,12 @@ limitations under the License.
       <HintPath Condition="Exists('..\..\packages')">..\..\packages\NMock3.3.5.44\lib\net40\NMock3.dll</HintPath>
       <HintPath Condition="Exists('{{binRelativePath}}')">{{binRelativePath}}\NMock3.3.5.44\lib\net40\NMock3.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+        <HintPath Condition="Exists('$(SolutionDir)\packages')">$(SolutionDir)\packages\log4net.2.0.8\lib\{{targetFrameworkNuget}}\log4net.dll</HintPath>
+        <HintPath Condition="Exists('..\packages')">..\packages\log4net.2.0.8\lib\{{targetFrameworkNuget}}\log4net.dll</HintPath>
+        <HintPath Condition="Exists('..\..\packages')">..\..\packages\log4net.2.0.8\lib\{{targetFrameworkNuget}}\log4net.dll</HintPath>
+        <HintPath Condition="Exists('{{binRelativePath}}')">{{binRelativePath}}\log4net.2.0.8\lib\{{targetFrameworkNuget}}\log4net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="**\*.cs"/>
