@@ -332,7 +332,5 @@ namespace AuthorizeNet.Rest.Test
             var response = instance.UpdateCustomerAddress(customerId, addressId, updateCustomerAddress, authorization);
             Assert.IsInstanceOf<Address>(response, "response is Customer");
         }
-        
     }
-
 }

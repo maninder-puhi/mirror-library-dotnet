@@ -216,7 +216,7 @@ namespace AuthorizeNet.Rest.Test
         [Test]
         public void PerformActionsTest()
         {
-            string invoiceNumber = null;
+            string invoiceNumber = "12343";
             string authorization = "Basic asdadsa";
             mockRestClient.Expects.One.Method(v => v.Execute(new RestRequest())).With(NMock.Is.TypeOf(typeof(RestRequest))).WillReturn(invoiceResponse);
             ApiClient apiClient = new ApiClient(mockRestClient.MockObject);
